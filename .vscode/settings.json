@@ -1,0 +1,12 @@
+{
+    "editor.formatOnSave": true,
+    "editor.defaultFormatter": "eeyore.yapf",
+    "python.analysis.typeCheckingMode": "off",
+    "python.analysis.completeFunctionParens": true,
+    "python.analysis.autoFormatStrings": true,
+    "python.analysis.enablePytestSupport": true,
+    "python.languageServer": "Pylance",
+    "[python]": {
+        "editor.defaultFormatter": "eeyore.yapf"
+    },
+}
