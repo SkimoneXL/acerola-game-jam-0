@@ -8,10 +8,9 @@ from game.constants import UserEvent
 
 
 class MainMenu(Scene):
-    _next_scene = SceneRegistry.LEVEL_1
 
     def render(self, surface: Surface):
-        font = Font()
+        font = Font('game/assets/fonts/Silver.ttf', 50)
         text: Surface = font.render('Main Menu', True, (100, 200, 100))
         text_rect = text.get_rect()
         text_rect.center = (500, 500)
@@ -23,7 +22,7 @@ class MainMenu(Scene):
             post(Event(UserEvent.SCENE_CHANGE))
 
     def get_next_scene(self):
-        return self._next_scene
+        return SceneRegistry.SCHOOL_1
 
     def handle_event(self, event):
         ...

@@ -4,6 +4,8 @@ from game.scene.manager import SceneManager
 
 def main() -> None:
     pygame.init()
+    pygame.font.init()
+
     surface = pygame.display.set_mode((1280, 720))
     clock = pygame.time.Clock()
     running = True

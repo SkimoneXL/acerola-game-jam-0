@@ -1,8 +1,9 @@
 from abc import ABC, abstractmethod
 from pygame import Surface
+from pygame.sprite import Group
 
 
-class Scene(ABC):
+class Scene(ABC, Group):
 
     @abstractmethod
     def render(self, surface: Surface):
