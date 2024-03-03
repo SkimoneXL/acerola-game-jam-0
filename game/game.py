@@ -1,6 +1,8 @@
 import pygame
-from game.scene.manager import SceneManager
+
 from game import game_clock
+from game.player.player import Player
+from game.scene.manager import SceneManager
 
 
 def main() -> None:
@@ -10,7 +12,8 @@ def main() -> None:
     surface = pygame.display.set_mode((1280, 720), flags=pygame.SCALED)
     running = True
 
-    scene_manager = SceneManager(surface)
+    player = Player()
+    scene_manager = SceneManager(player, surface)
 
     while running:
 

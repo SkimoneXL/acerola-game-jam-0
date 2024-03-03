@@ -1,13 +1,19 @@
-from pygame import Surface
 import pygame
+from attr import define
+from pygame import Surface
+from pygame.event import Event, post
+from pygame.font import Font
+
+from game.constants import UserEvent
+from game.player.player import Player
 from game.scene.registry import SceneRegistry
 from game.scene.scene import Scene
-from pygame.font import Font
-from pygame.event import Event, post
-from game.constants import UserEvent
 
 
 class MainMenu(Scene):
+
+    def __init__(self, player: Player):
+        super().__init__(player)
 
     def render(self, surface: Surface):
         font = Font('game/assets/fonts/Silver.ttf', 50)

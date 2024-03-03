@@ -1,4 +1,5 @@
 from enum import IntEnum, StrEnum, auto, unique
+
 from pygame.font import Font
 
 

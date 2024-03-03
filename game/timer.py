@@ -1,5 +1,6 @@
 from attr import define
 from pygame.time import Clock
+
 from game import game_clock
 
 

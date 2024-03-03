@@ -1,9 +1,10 @@
-from functools import cache
 import json
-from attrs import define
+from functools import cache
 from typing import Any
-from pygame import Surface
+
 import pygame
+from attrs import define
+from pygame import Surface
 from pygame.font import Font
 from pygame.sprite import Sprite
 
@@ -64,6 +65,7 @@ class Utterance:
 
     def update(self):
         if self.done: return
+
         current_line = self.lines[self.current_line]
 
         if current_line.done:
@@ -124,8 +126,8 @@ class TextGUI:
         self.fixed_update_timer.reset()
 
     def render(self, surface: Surface):
-        if self.done: return
-        self.utterances[self.current_utterance].render(surface)
+        if not self.done:
+            self.utterances[self.current_utterance].render(surface)
 
     def handle_keypress(self):
         if self.throttle_input: return
