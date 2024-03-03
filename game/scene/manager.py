@@ -7,6 +7,8 @@ from game.scene.scene import Scene
 from game.constants import UserEvent
 from pygame import Surface
 
+from game.scene.textutils import TextGUI, load_script
+
 
 def get_scene(scene: SceneRegistry) -> Scene:
     match (scene):

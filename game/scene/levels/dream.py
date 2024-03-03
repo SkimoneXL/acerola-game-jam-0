@@ -1,22 +1,21 @@
 from pygame import Surface
 import pygame
-from game.constants import UserEvent
 from game.scene.registry import SceneRegistry
 from game.scene.scene import Scene
-from pygame.font import Font
-from pygame.event import Event, post
+
+from game.scene.textutils import TextGUI
 
 
 class Dream_1(Scene):
 
+    def __init__(self):
+        self.gui = TextGUI.create(SceneRegistry.DREAM_1)
+
     def render(self, surface: Surface):
-        font = Font()
-        text: Surface = font.render('Dream 1', True, (100, 200, 100))
-        text_rect = text.get_rect()
-        text_rect.center = (500, 500)
-        surface.blit(text, text_rect)
+        self.gui.render(surface)
 
     def update(self):
+        self.gui.update()
         keys = pygame.key.get_pressed()
 
     def get_next_scene(self):
@@ -28,14 +27,14 @@ class Dream_1(Scene):
 
 class Dream_2(Scene):
 
+    def __init__(self):
+        self.gui = TextGUI.create(SceneRegistry.DREAM_2)
+
     def render(self, surface: Surface):
-        font = Font()
-        text: Surface = font.render('Dream 2', True, (100, 200, 100))
-        text_rect = text.get_rect()
-        text_rect.center = (500, 500)
-        surface.blit(text, text_rect)
+        self.gui.render(surface)
 
     def update(self):
+        self.gui.update()
         keys = pygame.key.get_pressed()
 
     def get_next_scene(self):

@@ -1,26 +1,20 @@
 from pygame import Surface
 import pygame
-from game.scene.registry import FontRegistry, SceneRegistry
+from game.scene.registry import SceneRegistry
 from game.scene.scene import Scene
-from pygame.font import Font
-from game.scene.textutils import ScrolledText
+from game.scene.textutils import TextGUI
 
 
 class School_1(Scene):
 
     def __init__(self):
-        self.scroll_text = ScrolledText(
-            text='School 1',
-            font=FontRegistry.get(FontRegistry.SILVER, 50),
-            color=(0, 0, 0),
-            position=(400, 400),
-        )
+        self.gui = TextGUI.create(SceneRegistry.SCHOOL_1)
 
     def render(self, surface: Surface):
-        self.scroll_text.render(surface)
+        self.gui.render(surface)
 
     def update(self):
-        self.scroll_text.update()
+        self.gui.update()
         keys = pygame.key.get_pressed()
 
     def get_next_scene(self):
@@ -32,14 +26,14 @@ class School_1(Scene):
 
 class School_2(Scene):
 
+    def __init__(self):
+        self.gui = TextGUI.create(SceneRegistry.SCHOOL_1)
+
     def render(self, surface: Surface):
-        font = Font()
-        text: Surface = font.render('School 2', True, (100, 200, 100))
-        text_rect = text.get_rect()
-        text_rect.center = (500, 500)
-        surface.blit(text, text_rect)
+        self.gui.render(surface)
 
     def update(self):
+        self.gui.update()
         keys = pygame.key.get_pressed()
 
     def get_next_scene(self):

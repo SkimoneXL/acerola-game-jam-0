@@ -1,15 +1,14 @@
-from enum import Enum, IntEnum, StrEnum, auto, unique
+from enum import IntEnum, StrEnum, auto, unique
 from pygame.font import Font
 
 
 @unique
 class SceneRegistry(IntEnum):
-    __order__ = "MAIN_MENU SCHOOL_1 DREAM_1 SCHOOL_2 DREAM_2"
-    MAIN_MENU = auto()
-    SCHOOL_1 = auto()
-    DREAM_1 = auto()
-    SCHOOL_2 = auto()
-    DREAM_2 = auto()
+    MAIN_MENU = -1
+    SCHOOL_1 = 0
+    DREAM_1 = 1
+    SCHOOL_2 = 2
+    DREAM_2 = 3
 
 
 @unique
@@ -19,3 +18,12 @@ class FontRegistry(StrEnum):
     @staticmethod
     def get(font_name: str, size: int = 20):
         return Font(font_name, size=size)
+
+
+@unique
+class TextRegistry(StrEnum):
+    """
+    Probably never going to be translated,
+    but it's easy enough to program it this way
+    """
+    ENGLISH: str = 'game/assets/text/en/script.json'
