@@ -16,5 +16,6 @@ class Timer:
         if self._cumulative_time >= self.duration:
             self.done = True
 
-    def __bool__(self):
-        return self.done
+    def reset(self):
+        self._cumulative_time = 0
+        self.done = 0

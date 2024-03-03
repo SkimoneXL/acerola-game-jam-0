@@ -84,8 +84,9 @@ class Utterance:
 @define(kw_only=True)
 class TextGUI:
     font: Font
-    utterances: tuple[Utterance, ...]
+    fixed_update_timer: Timer
     throttle_timer: Timer
+    utterances: tuple[Utterance, ...]
     box: Sprite = None
     current_utterance: int = 0
     done: bool = False
@@ -103,17 +104,24 @@ class TextGUI:
                 for utterance in parse_script(scene.value)),
             throttle_timer=Timer(duration=1500),
             throttle_input=True,
+            fixed_update_timer=Timer(duration=10),
         )
 
     def update(self):
         if self.done: return
+
         if self.throttle_input:
             self.throttle_timer.update()
-        if self.throttle_timer:
+        if self.throttle_timer.done:
             self.throttle_input = False
+
+        self.fixed_update_timer.update()
+        if not self.fixed_update_timer.done: return
 
         self.utterances[self.current_utterance].update()
         self.handle_keypress()
+
+        self.fixed_update_timer.reset()
 
     def render(self, surface: Surface):
         if self.done: return
@@ -128,7 +136,7 @@ class TextGUI:
             if self.current_utterance == len(self.utterances):
                 self.done = True
             else:
-                self.throttle_timer = Timer(duration=1500)
+                self.throttle_timer.reset()
 
 
 @cache
