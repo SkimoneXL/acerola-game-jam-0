@@ -3,10 +3,12 @@ import json
 from attrs import define
 from typing import Any
 from pygame import Surface
+import pygame
 from pygame.font import Font
 from pygame.sprite import Sprite
 
 from game.scene.registry import FontRegistry, SceneRegistry
+from game.timer import Timer
 
 
 @define(kw_only=True)
@@ -15,12 +17,20 @@ class ScrolledText:
     font: Font
     color: Any
     position: tuple[int, int]
+    done: bool = False
+    index: int = 0
     _str_buffer: str = ''
-    _index: int = 0
+
+    @property
+    def text_length(self):
+        return len(self.text)
 
     def update(self):
-        self._str_buffer = self.text[:self._index % (len(self.text) - 1)]
-        self._index += 1
+        if self.done: return
+        self._str_buffer = self.text[:self.index]
+        self.index += 1
+        if self.index == len(self.text) + 1:
+            self.done = True
 
     def render(self, surface: Surface):
         text_surface = self.font.render(self._str_buffer, True, self.color)
@@ -34,6 +44,8 @@ class ScrolledText:
 class Utterance:
     lines: tuple[ScrolledText, ...]
     current_line: int
+    done: bool
+    _line_buffer: list[ScrolledText]
 
     def __init__(self, lines: tuple[str], font: Font, fontsize: int):
         color = (0, 0, 0)
@@ -44,22 +56,40 @@ class Utterance:
                 font=font,
                 color=color,
                 position=(x, y + i * fontsize),
+                done=False,
             ) for i, line in enumerate(lines))
         self.current_line = 0
+        self.done = False
+        self._line_buffer = [self.lines[0]]
 
     def update(self):
-        self.lines[self.current_line].update()
+        if self.done: return
+        current_line = self.lines[self.current_line]
+
+        if current_line.done:
+            self.current_line += 1
+            if self.current_line == len(self.lines):
+                self.done = True
+                return
+            self._line_buffer.append(self.lines[self.current_line])
+
+        for _line in self._line_buffer:
+            _line.update()
 
     def render(self, surface: Surface):
-        self.lines[self.current_line].render(surface)
+        for line in self._line_buffer:
+            line.render(surface)
 
 
 @define(kw_only=True)
 class TextGUI:
-    box: Sprite
-    current_utterance: int
     font: Font
     utterances: tuple[Utterance, ...]
+    throttle_timer: Timer
+    box: Sprite = None
+    current_utterance: int = 0
+    done: bool = False
+    throttle_input: bool = False
 
     @staticmethod
     def create(scene: SceneRegistry):
@@ -71,15 +101,34 @@ class TextGUI:
             utterances=tuple(
                 Utterance(lines=utterance, font=font, fontsize=fontsize)
                 for utterance in parse_script(scene.value)),
-            box=None,
-            current_utterance=0,
+            throttle_timer=Timer(duration=1500),
+            throttle_input=True,
         )
 
     def update(self):
+        if self.done: return
+        if self.throttle_input:
+            self.throttle_timer.update()
+        if self.throttle_timer:
+            self.throttle_input = False
+
         self.utterances[self.current_utterance].update()
+        self.handle_keypress()
 
     def render(self, surface: Surface):
+        if self.done: return
         self.utterances[self.current_utterance].render(surface)
+
+    def handle_keypress(self):
+        if self.throttle_input: return
+
+        if pygame.key.get_pressed()[pygame.K_SPACE]:
+            self.throttle_input = True
+            self.current_utterance += 1
+            if self.current_utterance == len(self.utterances):
+                self.done = True
+            else:
+                self.throttle_timer = Timer(duration=1500)
 
 
 @cache

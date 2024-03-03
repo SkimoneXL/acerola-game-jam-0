@@ -1,5 +1,6 @@
 from pygame import Surface
 import pygame
+from game.constants import UserEvent
 from game.scene.registry import SceneRegistry
 from game.scene.scene import Scene
 
