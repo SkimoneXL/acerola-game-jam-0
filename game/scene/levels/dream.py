@@ -26,7 +26,7 @@ class Dream_1(Scene):
         return SceneRegistry.SCHOOL_2
 
     def handle_event(self, event):
-        ...
+        self.player.handle_event(event)
 
 
 class Dream_2(Scene):
@@ -48,4 +48,4 @@ class Dream_2(Scene):
         return SceneRegistry.MAIN_MENU
 
     def handle_event(self, event):
-        ...
+        self.player.handle_event(event)

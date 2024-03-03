@@ -1,35 +1,45 @@
+from attr import define
 from pygame import Surface
 import pygame
 from pygame.sprite import Sprite
+from game.constants import UserEvent
+from game.player.physics import State
 
-from game.timer import Timer
 
-
+@define
 class Player(Sprite):
+    image: Sprite
+    physics: State
 
-    def __init__(self):
+    def __init__(
+        self,
+        image=None,
+        physics=None,
+    ):
         Sprite.__init__(self)
         self.image = Surface((100, 200))
         self.image.fill((0, 0, 0))
-        self.x, self.y = (20, 20)
-        self.fixed_update_timer = Timer(duration=10)
+        self.physics = State()
 
     @property
     def position(self):
-        return self.x, self.y
+        return self.physics.pos.xy
 
     def update(self):
-        self.fixed_update_timer.update()
-        if self.fixed_update_timer.done:
-            self.fixed_update()
-            self.fixed_update_timer.reset()
+        self.physics.update()
 
-    def fixed_update(self):
+    def handle_input(self):
         keys = pygame.key.get_pressed()
-        if keys[pygame.K_LEFT]:
-            self.x -= 10
-        if keys[pygame.K_RIGHT]:
-            self.x += 10
+        if keys[pygame.K_a]:
+            self.physics.move_left()
+        if keys[pygame.K_d]:
+            self.physics.move_right()
 
     def render(self, surface: Surface):
         surface.blit(self.image, self.position)
+
+    def handle_event(self, event):
+        match (event.type):
+            case (UserEvent.FIXED_PHYSICS_UPDATE):
+                self.handle_input()
+                self.physics.step()

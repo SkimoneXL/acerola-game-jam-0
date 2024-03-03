@@ -3,6 +3,7 @@ import pygame
 from game import game_clock
 from game.player.player import Player
 from game.scene.manager import SceneManager
+from game.scene.registry import FontRegistry
 
 
 def main() -> None:
@@ -22,6 +23,15 @@ def main() -> None:
 
         scene_manager.update()
         scene_manager.render()
+
+        surface.blit(
+            FontRegistry.get(FontRegistry.SILVER).render(
+                str(int(game_clock.get_fps())),
+                True,
+                (0, 0, 0),
+            ),
+            (1000, 0),
+        )
 
         pygame.display.flip()
 

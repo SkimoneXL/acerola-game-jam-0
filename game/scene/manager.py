@@ -54,6 +54,8 @@ class SceneManager:
                     reg = self.current_scene.get_next_scene()
                     scene = get_scene(reg, self.player)
                     self.change_scene(scene)
+                case UserEvent.FIXED_PHYSICS_UPDATE:
+                    self.current_scene.handle_event(event)
 
         return True
 
