@@ -104,9 +104,9 @@ class TextGUI:
             utterances=tuple(
                 Utterance(lines=utterance, font=font, fontsize=fontsize)
                 for utterance in parse_script(scene.value)),
-            throttle_timer=Timer(duration=1500),
+            throttle_timer=Timer(duration_millis=1500),
             throttle_input=True,
-            fixed_update_timer=Timer(duration=10),
+            fixed_update_timer=Timer(duration_millis=10),
         )
 
     def update(self):

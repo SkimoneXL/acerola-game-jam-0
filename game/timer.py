@@ -6,17 +6,17 @@ from game import game_clock
 
 @define(kw_only=True)
 class Timer:
-    duration: int
-    _clock: Clock = game_clock
-    _cumulative_time: float = 0.0
+    duration_millis: int
+    clock: Clock = game_clock
+    cumulative_millis: float = 0.0
     done: bool = False
 
     def update(self):
         if self.done: return
-        self._cumulative_time += self._clock.get_time()
-        if self._cumulative_time >= self.duration:
+        self.cumulative_millis += self.clock.get_time()
+        if self.cumulative_millis >= self.duration_millis:
             self.done = True
 
     def reset(self):
-        self._cumulative_time = 0
+        self.cumulative_millis = 0
         self.done = 0
