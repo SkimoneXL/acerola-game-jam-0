@@ -1,5 +1,5 @@
 from attr import define
-from pygame import Surface
+from pygame import Rect, Surface
 import pygame
 from pygame.sprite import Sprite
 from game.player.physics import State
@@ -16,8 +16,9 @@ class Player(Sprite):
             physics=State(),
     ):
         Sprite.__init__(self)
-        self.image = Surface((100, 200))
+        self.image = Surface((10, 20))
         self.image.fill((0, 0, 0))
+        self.rect = self.image.get_rect()
         self.physics = physics
         self.last_keyup = 0
 
@@ -28,6 +29,7 @@ class Player(Sprite):
     def update(self):
         self.handle_held_keys()
         self.physics.update()
+        self.rect.update(*self.position, self.rect.width, self.rect.height)
 
     def handle_held_keys(self):
         keys = pygame.key.get_pressed()

@@ -1,6 +1,18 @@
+from functools import lru_cache
+import json
+from typing import Any
+from attr import define
 import numpy as np
 from pygame import Surface, Rect
 import pygame
+
+
+@define(kw_only=True)
+class Tile:
+    image: Surface
+    index: int
+    collision: bool
+    rect: Rect
 
 
 class TileSet:
@@ -18,7 +30,7 @@ class TileSet:
         self.spacing = spacing
         self.image: Surface = pygame.image.load(file).convert_alpha()
         self.rect: Rect = self.image.get_rect()
-        self.tiles: list[Surface] = []
+        self.tiles: list[Tile] = []
         self.load()
 
     def load(self):
@@ -33,7 +45,8 @@ class TileSet:
             for y in range(y0, h, dy):
                 tile = Surface(self.size, flags=pygame.SRCALPHA).convert_alpha()
                 tile.blit(self.image, (0, 0), (x, y, *self.size))
-                self.tiles.append(tile)
+                self.tiles.append(Tile(image=tile, index=len(self.tiles), collision=True,
+                                       rect=None))
 
     def __str__(self):
         return f'{self.__class__.__name__} file:{self.file} tile:{self.size}'
@@ -41,38 +54,56 @@ class TileSet:
 
 class TileMap:
 
-    def __init__(self, tileset: TileSet, size: tuple[int, int] = (3, 8), rect: Rect = None):
-        self.size = size
+    def __init__(
+        self,
+        tileset: TileSet,
+        level_json_filename: str,
+    ):
         self.tileset = tileset
-        self.map = np.zeros(size, dtype=int)
+        self.EMPTY_TILE_INDEX = 0
+        self.level_json_filename = level_json_filename
+        self.load()
 
-        h, w = self.size
-        self.image = Surface((32 * w, 32 * h), flags=pygame.SRCALPHA).convert_alpha()
-        if rect:
-            self.rect = Rect(rect)
-        else:
-            self.rect = self.image.get_rect()
-
-        self.set_random()
+    def load(self):
+        with open(self.level_json_filename, 'r', encoding='utf-8') as f:
+            level_data = json.load(f)
+        self.map = np.array(level_data['tile_data'])
+        self.size = self.map.shape
+        self._construct_image()
 
     def render(self, surface: Surface):
         surface.blit(self.image, (0, 0))
 
-    def construct_image(self):
+    def _construct_image(self):
+        h, w = self.size
+        self.image = Surface((32 * w, 32 * h), flags=pygame.SRCALPHA).convert_alpha()
+        self.rect = self.image.get_rect()
+
         m, n = self.map.shape
         for i in range(m):
             for j in range(n):
-                tile = self.tileset.tiles[self.map[i, j]]
-                self.image.blit(tile, (j * 32, i * 32))
+                ti = self.map[i, j]
+                if ti == self.EMPTY_TILE_INDEX: continue
+                self.image.blit(
+                    self.tileset.tiles[ti].image,
+                    (j * 32, i * 32),
+                )
+                self.tileset.tiles[ti].rect = Rect(j * 32, i * 32, 32, 32)
 
-    def set_zero(self):
-        self.map = np.zeros(self.size, dtype=int)
-        self.construct_image()
+    @lru_cache
+    def get_tile_bounds(self):
+        m, n = self.map.shape
+        result = []
+        for i in range(m):
+            for j in range(n):
+                ti = self.map[i, j]
+                if ti == self.EMPTY_TILE_INDEX: continue
+                result.append(self.tileset.tiles[ti].rect)
+        return result
 
-    def set_random(self):
-        n = len(self.tileset.tiles)
-        self.map = np.random.randint(n, size=self.size)
-        self.construct_image()
+    def handle_event(self, event):
+        if event.type == pygame.KEYDOWN and event.key == pygame.K_l:
+            self.load()
 
     def __str__(self):
         return f'{self.__class__.__name__} {self.size}'

@@ -30,7 +30,7 @@ class Vec2:
 
     @property
     def xy(self):
-        return self.x, self.y
+        return int(self.x), int(self.y)
 
 
 @define(frozen=True, kw_only=True)
@@ -87,6 +87,11 @@ class State:
 
     def stop_movement(self):
         self.vel.x = 0
+
+    def stop_everything(self):
+        self.vel = Vec2(0.0, 0.0)
+        self.force = Vec2(0.0, 0.0)
+        self.gravity = 0.0
 
     def jump(self):
         self.vel.y = -self.jump_speed
