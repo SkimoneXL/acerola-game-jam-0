@@ -21,13 +21,14 @@ class School_1(Scene):
         #self.gui.render(surface)
 
     def update(self):
-        self.detect_collisions()
         self.player.update()
+        self.detect_collisions()
         #self.gui.update()
 
-    def detect_collisions(self) -> bool:
+    def detect_collisions(self) -> None:
         for rect in self.tilemap.get_tile_bounds():
-            self.player.physics.detect_collision(self.player.rect, rect)
+            if self.player.physics.detect_collision(self.player.rect, rect):
+                return
 
     def get_next_scene(self):
         return SceneRegistry.DREAM_1

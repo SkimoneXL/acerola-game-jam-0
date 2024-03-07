@@ -40,6 +40,10 @@ class FixedPhysics:
     fixed_update_timer: Timer
     updates_per_second: int
 
+    @property
+    def millis_per_update(self):
+        return 1000 / self.updates_per_second
+
     @staticmethod
     def default():
         updates_per_second = 240
@@ -59,6 +63,14 @@ class FixedPhysics:
             self.fixed_update_timer.reset()
 
 
+@define
+class BlockedState:
+    north: bool = False
+    south: bool = False
+    east: bool = False
+    west: bool = False
+
+
 @define(kw_only=True)
 class State:
     pos: Vec2 = Vec2(0.0, 0.0)
@@ -69,6 +81,7 @@ class State:
     gravity: float = 0.01
     jump_speed: float = 2.0
     fixed_physics = FixedPhysics.default()
+    blocked: BlockedState = BlockedState()
 
     def update(self):
         self.fixed_physics.update()
@@ -83,9 +96,15 @@ class State:
 
     def move_left(self):
         self.vel.x = -self.speed
+        self.pos.x -= 1
 
     def move_right(self):
         self.vel.x = self.speed
+        self.pos.x += 1
+
+    def jump(self):
+        self.vel.y = -self.jump_speed
+        self.pos.y -= 1
 
     def lateral_stop(self):
         self.vel.x = 0.0
@@ -93,29 +112,38 @@ class State:
     def vertical_stop(self):
         self.vel.y = 0.0
 
-    def jump(self):
-        self.vel.y = -self.jump_speed
-
     def detect_collision(self, player: Rect, rect: Rect) -> bool:
         # North
         if rect.collidepoint(player.midtop):
-            #self.vertical_stop()
+            self.vertical_stop()
             self.snap_downward(player, rect)
+            self.blocked.north = True
+        else:
+            self.blocked.north = False
 
         # South
         if rect.collidepoint(player.midbottom):
-            #self.vertical_stop()
+            self.vertical_stop()
             self.snap_upward(player, rect)
+            self.blocked.south = True
+        else:
+            self.blocked.south = False
 
         # East
         if rect.collidepoint(player.midright):
             self.lateral_stop()
             self.snap_left(player, rect)
+            self.blocked.east = True
+        else:
+            self.blocked.east = False
 
         # West
         if rect.collidepoint(player.midleft):
             self.lateral_stop()
             self.snap_right(player, rect)
+            self.blocked.west = True
+        else:
+            self.blocked.west = False
 
     def snap_upward(self, player: Rect, rect: Rect):
         self.pos.y = (player.bottom // rect.height) * rect.height - player.height
