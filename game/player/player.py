@@ -1,5 +1,5 @@
 from attr import define
-from pygame import Rect, Surface
+from pygame import Surface
 import pygame
 from pygame.sprite import Sprite
 from game.player.physics import State
@@ -49,10 +49,10 @@ class Player(Sprite):
     def handle_event(self, event):
         if event.type == pygame.KEYUP:
             if event.key == pygame.K_a:
-                self.physics.stop_movement()
+                self.physics.lateral_stop()
                 self.last_keyup = pygame.K_a
             elif event.key == pygame.K_d:
-                self.physics.stop_movement()
+                self.physics.lateral_stop()
                 self.last_keyup = pygame.K_d
         elif event.type == pygame.KEYDOWN:
             if event.key == pygame.K_SPACE:

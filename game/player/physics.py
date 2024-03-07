@@ -1,3 +1,4 @@
+from pygame import Rect
 from pygame.event import Event, post
 from attr import define
 import numpy as np
@@ -6,6 +7,7 @@ from game.constants import UserEvent
 from game.timer import Timer
 
 
+@define
 class Vec2:
     data: np.ndarray
 
@@ -85,16 +87,47 @@ class State:
     def move_right(self):
         self.vel.x = self.speed
 
-    def stop_movement(self):
-        self.vel.x = 0
+    def lateral_stop(self):
+        self.vel.x = 0.0
 
-    def stop_everything(self):
-        self.vel = Vec2(0.0, 0.0)
-        self.force = Vec2(0.0, 0.0)
-        self.gravity = 0.0
+    def vertical_stop(self):
+        self.vel.y = 0.0
 
     def jump(self):
         self.vel.y = -self.jump_speed
+
+    def detect_collision(self, player: Rect, rect: Rect) -> bool:
+        # North
+        if rect.collidepoint(player.midtop):
+            #self.vertical_stop()
+            self.snap_downward(player, rect)
+
+        # South
+        if rect.collidepoint(player.midbottom):
+            #self.vertical_stop()
+            self.snap_upward(player, rect)
+
+        # East
+        if rect.collidepoint(player.midright):
+            self.lateral_stop()
+            self.snap_left(player, rect)
+
+        # West
+        if rect.collidepoint(player.midleft):
+            self.lateral_stop()
+            self.snap_right(player, rect)
+
+    def snap_upward(self, player: Rect, rect: Rect):
+        self.pos.y = (player.bottom // rect.height) * rect.height - player.height
+
+    def snap_downward(self, player: Rect, rect: Rect):
+        self.pos.y = (player.top // rect.height) * rect.height + player.height
+
+    def snap_left(self, player: Rect, rect: Rect):
+        self.pos.x = (player.right // rect.width) * rect.width - player.width
+
+    def snap_right(self, player: Rect, rect: Rect):
+        self.pos.x = (player.left // rect.width) * rect.width + player.width
 
 
 @define

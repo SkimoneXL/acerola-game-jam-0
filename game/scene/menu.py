@@ -1,5 +1,4 @@
 import pygame
-from attr import define
 from pygame import Surface
 from pygame.event import Event, post
 from pygame.font import Font
