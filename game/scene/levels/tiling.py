@@ -1,9 +1,10 @@
-from functools import lru_cache
 import json
-from attr import define
+from functools import lru_cache
+
 import numpy as np
-from pygame import Surface, Rect
 import pygame
+from attr import define
+from pygame import Rect, Surface
 
 
 @define(kw_only=True)

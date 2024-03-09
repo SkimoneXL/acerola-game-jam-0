@@ -1,21 +1,23 @@
+import pygame
 from attr import define
 from pygame import Surface
-import pygame
 from pygame.sprite import Sprite
-from game.player.physics import State
+
+from game.player.physics import PhysicsState
+from game.scene.levels.tiling import TileMap
 
 
 @define
 class Player(Sprite):
     image: Sprite
-    physics: State
+    physics: PhysicsState
 
     def __init__(self):
         Sprite.__init__(self)
         self.image = Surface((10, 20))
         self.image.fill((0, 0, 0))
         self.rect = self.image.get_rect()
-        self.physics = State()
+        self.physics = PhysicsState()
         self.last_keyup = 0
         self.jump_counter = 0
         self.can_jump = True
@@ -28,7 +30,7 @@ class Player(Sprite):
         self.handle_held_keys()
         self.physics.update()
         self.rect.update(*self.position, self.rect.width, self.rect.height)
-        self.reset_jump()
+        self.update_jump_state()
 
     def handle_held_keys(self):
         keys = pygame.key.get_pressed()
@@ -65,7 +67,7 @@ class Player(Sprite):
             self.can_jump = False
             self.jump_counter += 1
 
-    def reset_jump(self):
+    def update_jump_state(self):
         blocked = self.physics.blocked
         self.can_jump = blocked.east or blocked.west or blocked.south or self.jump_counter < 1
         self.jump_counter = 0 if self.jump_counter >= 2 else self.jump_counter

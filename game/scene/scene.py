@@ -14,11 +14,11 @@ class Scene(ABC):
     player: Player
 
     @abstractmethod
-    def render(self, surface: Surface):
+    def render(self, surface: Surface) -> None:
         ...
 
     @abstractmethod
-    def update(self):
+    def update(self) -> None:
         ...
 
     @abstractmethod
@@ -26,5 +26,5 @@ class Scene(ABC):
         ...
 
     @abstractmethod
-    def handle_event(self, event):
+    def handle_event(self, event) -> None:
         ...

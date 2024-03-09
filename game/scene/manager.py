@@ -1,12 +1,13 @@
 import pygame
 from pygame import Surface
 
+from game import game_clock
 from game.constants import UserEvent
 from game.player.player import Player
 from game.scene.levels.dream import Dream_1, Dream_2
 from game.scene.levels.school import School_1, School_2
 from game.scene.menu import MainMenu
-from game.scene.registry import SceneIndex
+from game.scene.registry import FontPath, SceneIndex
 from game.scene.scene import Scene
 
 
@@ -40,7 +41,16 @@ class SceneManager:
         self.current_scene = get_scene(current_scene, self.player)
 
     def render(self):
+        self.surface.fill((50, 70, 100))
         self.current_scene.render(self.surface)
+        self.surface.blit(
+            FontPath.get(FontPath.SILVER).render(
+                str(int(game_clock.get_fps())),
+                True,
+                (0, 0, 0),
+            ),
+            (1000, 0),
+        )
 
     def update(self):
         self.current_scene.update()

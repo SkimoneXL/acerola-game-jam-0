@@ -9,7 +9,7 @@ from pygame.font import Font
 from pygame.sprite import Sprite
 
 from game.scene.registry import FontPath, SceneIndex, ScriptPath
-from game.timer import Timer
+from game.timing import Timer
 
 
 @define(kw_only=True)

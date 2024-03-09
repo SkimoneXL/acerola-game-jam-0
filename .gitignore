@@ -1,3 +1,6 @@
+# for now, dont push placeholder animations
+game/assets/animations/
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]

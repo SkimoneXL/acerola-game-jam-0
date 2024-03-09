@@ -1,10 +1,9 @@
-from pygame import Rect
-from pygame.event import Event, post
-from attr import define
 import numpy as np
-from game.constants import UserEvent
+from attr import define
+from pygame import Rect
 
-from game.timer import Timer
+from game.constants import UserEvent
+from game.timing import FixedUpdate
 
 
 @define
@@ -35,34 +34,6 @@ class Vec2:
         return int(self.x), int(self.y)
 
 
-@define(frozen=True, kw_only=True)
-class FixedPhysics:
-    fixed_update_timer: Timer
-    updates_per_second: int
-
-    @property
-    def millis_per_update(self):
-        return 1000 / self.updates_per_second
-
-    @staticmethod
-    def default():
-        updates_per_second = 240
-        return FixedPhysics(
-            fixed_update_timer=Timer(duration_millis=1000 / updates_per_second),
-            updates_per_second=updates_per_second,
-        )
-
-    def update(self):
-        self.fixed_update_timer.update()
-        if self.fixed_update_timer.done:
-            post(
-                Event(
-                    UserEvent.FIXED_PHYSICS_UPDATE,
-                    time=self.fixed_update_timer.cumulative_millis,
-                ))
-            self.fixed_update_timer.reset()
-
-
 @define
 class BlockedState:
     north: bool = False
@@ -78,7 +49,7 @@ class BlockedState:
 
 
 @define(kw_only=True)
-class State:
+class PhysicsState:
     pos: Vec2 = Vec2(0.0, 0.0)
     vel: Vec2 = Vec2(0.0, 0.0)
     force: Vec2 = Vec2(0.0, 0.0)
@@ -86,7 +57,10 @@ class State:
     speed: float = 0.15
     gravity: float = 0.003
     jump_speed: float = 0.8
-    fixed_physics = FixedPhysics.default()
+    fixed_physics: FixedUpdate = FixedUpdate.create(
+        event_type=UserEvent.FIXED_PHYSICS_UPDATE,
+        updates_per_second=240,
+    )
     blocked: BlockedState = BlockedState()
 
     def update(self):
@@ -157,10 +131,10 @@ class State:
         self.pos.x = (player.left // rect.width) * rect.width + rect.width
 
 
-def euler(state: State, time: float):
+def euler(state: PhysicsState, time: float):
     state.pos.data += state.vel.data * time
     state.vel.data += (state.force.data / state.mass) * time
 
 
-def midpoint(state: State, time: float):
+def midpoint(state: PhysicsState, time: float):
     ...
