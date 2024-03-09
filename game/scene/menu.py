@@ -5,7 +5,7 @@ from pygame.font import Font
 
 from game.constants import UserEvent
 from game.player.player import Player
-from game.scene.registry import SceneRegistry
+from game.scene.registry import SceneIndex
 from game.scene.scene import Scene
 
 
@@ -27,7 +27,7 @@ class MainMenu(Scene):
             post(Event(UserEvent.SCENE_CHANGE))
 
     def get_next_scene(self):
-        return SceneRegistry.SCHOOL_1
+        return SceneIndex.SCHOOL_1
 
     def handle_event(self, event):
         ...

@@ -8,7 +8,7 @@ from pygame import Surface
 from pygame.font import Font
 from pygame.sprite import Sprite
 
-from game.scene.registry import FontRegistry, SceneRegistry
+from game.scene.registry import FontPath, SceneIndex, ScriptPath
 from game.timer import Timer
 
 
@@ -95,14 +95,14 @@ class TextGUI:
     throttle_input: bool = False
 
     @staticmethod
-    def create(scene: SceneRegistry):
+    def create(scene: SceneIndex):
         fontsize = 20
-        font = FontRegistry.get(FontRegistry.SILVER, fontsize)
+        font = FontPath.get(FontPath.SILVER, fontsize)
 
         return TextGUI(
             font=font,
             utterances=tuple(
-                Utterance(lines=utterance, font=font, fontsize=fontsize)
+                Utterance(lines=tuple(utterance), font=font, fontsize=fontsize)
                 for utterance in parse_script(scene.value)),
             throttle_timer=Timer(duration_millis=1500),
             throttle_input=True,
@@ -142,12 +142,13 @@ class TextGUI:
 
 
 @cache
-def load_script(filename: str = 'game/assets/text/en/script.json') -> dict:
+def load_script(filename: str) -> dict:
     with open(filename, encoding='utf-8', mode='r') as f:
         return json.load(f)
 
 
 @cache
-def parse_script(index: int) -> tuple[tuple[str, ...], ...]:
-    script = load_script()
-    return tuple(script['scenes'][index]['lines'])
+def parse_script(index: int) -> list[list[str]]:
+    script = load_script(ScriptPath.ENGLISH)
+    parsed = script['scenes'][index]['lines']
+    return parsed

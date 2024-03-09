@@ -4,7 +4,7 @@ from pygame.font import Font
 
 
 @unique
-class SceneRegistry(IntEnum):
+class SceneIndex(IntEnum):
     MAIN_MENU = -1
     SCHOOL_1 = 0
     DREAM_1 = 1
@@ -13,7 +13,7 @@ class SceneRegistry(IntEnum):
 
 
 @unique
-class TileMapRegistry(StrEnum):
+class TileMapPath(StrEnum):
     SCHOOL_1 = 'game/assets/tilemaps/school_1.json'
     DREAM_1 = 'game/assets/tilemaps/dream_1.json'
     SCHOOL_2 = 'game/assets/tilemaps/school_2.json'
@@ -21,7 +21,7 @@ class TileMapRegistry(StrEnum):
 
 
 @unique
-class FontRegistry(StrEnum):
+class FontPath(StrEnum):
     SILVER: str = 'game/assets/fonts/Silver.ttf'
 
     @staticmethod
@@ -30,7 +30,7 @@ class FontRegistry(StrEnum):
 
 
 @unique
-class TextRegistry(StrEnum):
+class ScriptPath(StrEnum):
     """
     Probably never going to be translated,
     but it's easy enough to program it this way

@@ -3,7 +3,7 @@ import pygame
 from game import game_clock
 from game.player.player import Player
 from game.scene.manager import SceneManager
-from game.scene.registry import FontRegistry
+from game.scene.registry import FontPath
 
 
 def main() -> None:
@@ -25,7 +25,7 @@ def main() -> None:
         scene_manager.render()
 
         surface.blit(
-            FontRegistry.get(FontRegistry.SILVER).render(
+            FontPath.get(FontPath.SILVER).render(
                 str(int(game_clock.get_fps())),
                 True,
                 (0, 0, 0),

@@ -66,18 +66,13 @@ class TileMap:
 
     def __init__(self, level_json_filename: str):
         self.level_json_filename = level_json_filename
-        level_data = self.load()
-        self.tileset = TileSet.create(level_data)
-        self._parse(level_data)
-
-    def reload(self):
-        with open(self.level_json_filename, 'r', encoding='utf-8') as f:
-            level_data = json.load(f)
-        self._parse(level_data)
+        self.load()
 
     def load(self):
         with open(self.level_json_filename, 'r', encoding='utf-8') as f:
-            return json.load(f)
+            level_data = json.load(f)
+        self.tileset = TileSet.create(level_data)
+        self._parse(level_data)
 
     def _parse(self, level_data):
         self.map = np.array(level_data['tile_data'])
@@ -102,7 +97,6 @@ class TileMap:
                     (j * 32, i * 32),
                 )
 
-    @lru_cache
     def get_tile_bounds(self):
         m, n = self.map.shape
         result = []
@@ -116,4 +110,4 @@ class TileMap:
 
     def handle_event(self, event):
         if event.type == pygame.KEYDOWN and event.key == pygame.K_l:
-            self.reload()
+            self.load()

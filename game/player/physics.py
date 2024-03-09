@@ -70,6 +70,12 @@ class BlockedState:
     east: bool = False
     west: bool = False
 
+    def set_all_false(self):
+        self.north = False
+        self.south = False
+        self.east = False
+        self.west = False
+
 
 @define(kw_only=True)
 class State:
@@ -77,9 +83,9 @@ class State:
     vel: Vec2 = Vec2(0.0, 0.0)
     force: Vec2 = Vec2(0.0, 0.0)
     mass: float = 1.0
-    speed: float = 1.0
-    gravity: float = 0.01
-    jump_speed: float = 2.0
+    speed: float = 0.15
+    gravity: float = 0.003
+    jump_speed: float = 0.8
     fixed_physics = FixedPhysics.default()
     blocked: BlockedState = BlockedState()
 
@@ -92,7 +98,7 @@ class State:
             self.step(event.dict['time'])
 
     def step(self, time):
-        Physics.euler(self, time)
+        euler(self, time)
 
     def move_left(self):
         self.vel.x = -self.speed
@@ -113,59 +119,48 @@ class State:
         self.vel.y = 0.0
 
     def detect_collision(self, player: Rect, rect: Rect) -> bool:
+
         # North
         if rect.collidepoint(player.midtop):
             self.vertical_stop()
             self.snap_downward(player, rect)
             self.blocked.north = True
-        else:
-            self.blocked.north = False
 
         # South
         if rect.collidepoint(player.midbottom):
             self.vertical_stop()
             self.snap_upward(player, rect)
             self.blocked.south = True
-        else:
-            self.blocked.south = False
 
         # East
         if rect.collidepoint(player.midright):
             self.lateral_stop()
             self.snap_left(player, rect)
             self.blocked.east = True
-        else:
-            self.blocked.east = False
 
         # West
         if rect.collidepoint(player.midleft):
             self.lateral_stop()
             self.snap_right(player, rect)
             self.blocked.west = True
-        else:
-            self.blocked.west = False
 
     def snap_upward(self, player: Rect, rect: Rect):
         self.pos.y = (player.bottom // rect.height) * rect.height - player.height
 
     def snap_downward(self, player: Rect, rect: Rect):
-        self.pos.y = (player.top // rect.height) * rect.height + player.height
+        self.pos.y = (player.top // rect.height) * rect.height + rect.height
 
     def snap_left(self, player: Rect, rect: Rect):
         self.pos.x = (player.right // rect.width) * rect.width - player.width
 
     def snap_right(self, player: Rect, rect: Rect):
-        self.pos.x = (player.left // rect.width) * rect.width + player.width
+        self.pos.x = (player.left // rect.width) * rect.width + rect.width
 
 
-@define
-class Physics:
+def euler(state: State, time: float):
+    state.pos.data += state.vel.data * time
+    state.vel.data += (state.force.data / state.mass) * time
 
-    @staticmethod
-    def euler(state: State, time: float):
-        state.pos.data += state.vel.data * time
-        state.vel.data += (state.force.data / state.mass) * time
 
-    @staticmethod
-    def midpoint(state: State, time: float):
-        ...
+def midpoint(state: State, time: float):
+    ...

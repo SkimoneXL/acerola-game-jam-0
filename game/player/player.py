@@ -10,17 +10,15 @@ class Player(Sprite):
     image: Sprite
     physics: State
 
-    def __init__(
-            self,
-            image=None,
-            physics=State(),
-    ):
+    def __init__(self):
         Sprite.__init__(self)
         self.image = Surface((10, 20))
         self.image.fill((0, 0, 0))
         self.rect = self.image.get_rect()
-        self.physics = physics
+        self.physics = State()
         self.last_keyup = 0
+        self.jump_counter = 0
+        self.can_jump = True
 
     @property
     def position(self):
@@ -30,6 +28,7 @@ class Player(Sprite):
         self.handle_held_keys()
         self.physics.update()
         self.rect.update(*self.position, self.rect.width, self.rect.height)
+        self.reset_jump()
 
     def handle_held_keys(self):
         keys = pygame.key.get_pressed()
@@ -56,6 +55,18 @@ class Player(Sprite):
                 self.last_keyup = pygame.K_d
         elif event.type == pygame.KEYDOWN:
             if event.key == pygame.K_SPACE:
-                self.physics.jump()
+                self.jump()
         else:
             self.physics.handle_event(event)
+
+    def jump(self):
+        if self.can_jump:
+            self.physics.jump()
+            self.can_jump = False
+            self.jump_counter += 1
+
+    def reset_jump(self):
+        blocked = self.physics.blocked
+        self.can_jump = blocked.east or blocked.west or blocked.south or self.jump_counter < 1
+        self.jump_counter = 0 if self.jump_counter >= 2 else self.jump_counter
+        self.physics.blocked.set_all_false()

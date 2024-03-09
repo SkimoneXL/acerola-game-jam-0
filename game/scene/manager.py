@@ -6,21 +6,21 @@ from game.player.player import Player
 from game.scene.levels.dream import Dream_1, Dream_2
 from game.scene.levels.school import School_1, School_2
 from game.scene.menu import MainMenu
-from game.scene.registry import SceneRegistry
+from game.scene.registry import SceneIndex
 from game.scene.scene import Scene
 
 
-def get_scene(scene: SceneRegistry, player: Player) -> Scene:
+def get_scene(scene: SceneIndex, player: Player) -> Scene:
     match (scene):
-        case SceneRegistry.MAIN_MENU:
+        case SceneIndex.MAIN_MENU:
             return MainMenu(player)
-        case SceneRegistry.SCHOOL_1:
+        case SceneIndex.SCHOOL_1:
             return School_1(player)
-        case SceneRegistry.SCHOOL_2:
+        case SceneIndex.SCHOOL_2:
             return School_2(player)
-        case SceneRegistry.DREAM_1:
+        case SceneIndex.DREAM_1:
             return Dream_1(player)
-        case SceneRegistry.DREAM_2:
+        case SceneIndex.DREAM_2:
             return Dream_2(player)
 
 
@@ -33,7 +33,7 @@ class SceneManager:
         self,
         player: Player,
         surface: Surface,
-        current_scene: SceneRegistry = SceneRegistry.MAIN_MENU,
+        current_scene: SceneIndex = SceneIndex.MAIN_MENU,
     ) -> None:
         self.surface = surface
         self.player = player
