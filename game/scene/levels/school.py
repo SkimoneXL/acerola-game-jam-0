@@ -18,12 +18,12 @@ class School_1(Scene):
     def render(self, surface: Surface) -> None:
         self.tilemap.render(surface)
         self.player.render(surface)
-        #self.gui.render(surface)
+        # self.gui.render(surface)
 
     def update(self) -> None:
         self.player.update()
         self.detect_collisions()
-        #self.gui.update()
+        # self.gui.update()
 
     def detect_collisions(self) -> None:
         for rect in self.tilemap.get_tile_bounds():
@@ -35,6 +35,7 @@ class School_1(Scene):
     def handle_event(self, event) -> None:
         self.player.handle_event(event)
         self.tilemap.handle_event(event)
+        #self.gui.handle_event(event)
 
 
 class School_2(Scene):

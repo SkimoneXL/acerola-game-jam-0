@@ -1,5 +1,4 @@
 import json
-from functools import lru_cache
 
 import numpy as np
 import pygame
@@ -17,49 +16,88 @@ class Tile:
 
 @define(kw_only=True)
 class TileSet:
-
     empty_tile_index: int
-    file: str
+    src_img_path: str
     margin: int
     size: tuple[int, int]
     spacing: int
-    has_collision: list[bool] = None
-    tiles: list[Tile] = None
+    tiles: list[Tile]
 
     @staticmethod
-    def create(level_data: dict):
+    def environment(level_data: dict):
         tile_set = level_data['tile_set']
-        return TileSet(
-            empty_tile_index=tile_set['empty_tile_index'],
-            file=tile_set['source_image'],
-            margin=tile_set['margin'],
-            size=(tile_set['tile_size_x'], tile_set['tile_size_y']),
-            spacing=tile_set['spacing'],
-            has_collision=tile_set['has_collision'],
-        )
+        empty_tile_index = tile_set['empty_tile_index']
+        src_img_path = tile_set['source_image']
+        margin = tile_set['margin']
+        size = (tile_set['tile_size_x'], tile_set['tile_size_y'])
+        spacing = tile_set['spacing']
+        has_collision = tile_set['has_collision']
 
-    def __attrs_post_init__(self):
-        self.load_tiles()
-
-    def load_tiles(self) -> list[Tile]:
-        self.tiles = []
-        image = pygame.image.load(self.file).convert_alpha()
-        x0 = y0 = self.margin
+        image = pygame.image.load(src_img_path).convert_alpha()
         w, h = image.get_rect().size
-        dx = self.size[0] + self.spacing
-        dy = self.size[1] + self.spacing
+        x0 = y0 = margin
+        dx = size[0] + spacing
+        dy = size[1] + spacing
+        tiles = []
 
         for i, x in enumerate(range(x0, w, dx)):
             for j, y in enumerate(range(y0, h, dy)):
-                tile = Surface(self.size, flags=pygame.SRCALPHA).convert_alpha()
-                tile.blit(image, (0, 0), (x, y, *self.size))
-                self.tiles.append(
+                tile = Surface(size, flags=pygame.SRCALPHA).convert_alpha()
+                tile.blit(image, (0, 0), (x, y, *size))
+                tiles.append(
                     Tile(
                         image=tile,
-                        index=len(self.tiles),
-                        collision=self.has_collision[j][i],
+                        index=len(tiles),
+                        collision=has_collision[j][i],
                         rect=tile.get_rect(),
                     ))
+
+        return TileSet(
+            empty_tile_index=empty_tile_index,
+            src_img_path=src_img_path,
+            margin=margin,
+            size=size,
+            spacing=spacing,
+            tiles=tiles,
+        )
+
+    @staticmethod
+    def player(
+            src_img_path: str,
+            margin: int = 0,
+            size: tuple[int, int] = (48, 48),
+            spacing: int = 0,
+            flipped: bool = False,
+    ):
+        image = pygame.image.load(src_img_path).convert_alpha()
+        w, h = image.get_rect().size
+        x0 = y0 = margin
+        dx = size[0] + spacing
+        dy = size[1] + spacing
+        tiles = []
+
+        for x in range(x0, w, dx):
+            for y in range(y0, h, dy):
+                tile = Surface(size, flags=pygame.SRCALPHA).convert_alpha()
+                tile.blit(image, (0, 0), (x, y, *size))
+                if flipped:
+                    tile = pygame.transform.flip(tile, True, False)
+                tiles.append(
+                    Tile(
+                        image=tile,
+                        index=len(tiles),
+                        collision=True,
+                        rect=tile.get_rect(),
+                    ))
+
+        return TileSet(
+            empty_tile_index=None,
+            src_img_path=src_img_path,
+            margin=margin,
+            size=size,
+            spacing=spacing,
+            tiles=tiles,
+        )
 
 
 class TileMap:
@@ -72,7 +110,7 @@ class TileMap:
     def load(self):
         with open(self.level_json_filename, 'r', encoding='utf-8') as f:
             level_data = json.load(f)
-        self.tileset = TileSet.create(level_data)
+        self.tileset = TileSet.environment(level_data)
         self._parse(level_data)
 
     def _parse(self, level_data):

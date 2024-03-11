@@ -5,11 +5,13 @@ from typing import Any
 import pygame
 from attrs import define
 from pygame import Surface
+from pygame.event import Event
 from pygame.font import Font
 from pygame.sprite import Sprite
 
+from game.constants import UserEvent
 from game.scene.registry import FontPath, SceneIndex, ScriptPath
-from game.timing import Timer
+from game.timing import FixedUpdate, Timer
 
 
 @define(kw_only=True)
@@ -86,7 +88,7 @@ class Utterance:
 @define(kw_only=True)
 class TextGUI:
     font: Font
-    fixed_update_timer: Timer
+    fixed_text: FixedUpdate
     throttle_timer: Timer
     utterances: tuple[Utterance, ...]
     box: Sprite = None
@@ -106,8 +108,17 @@ class TextGUI:
                 for utterance in parse_script(scene.value)),
             throttle_timer=Timer(duration_millis=1500),
             throttle_input=True,
-            fixed_update_timer=Timer(duration_millis=10),
+            fixed_text=FixedUpdate.create(
+                event_type=UserEvent.FIXED_TEXT_UPDATE,
+                updates_per_second=100,
+            ),
         )
+
+    def handle_event(self, event: Event):
+        if self.done: return
+
+        if event.type == UserEvent.FIXED_TEXT_UPDATE:
+            self.utterances[self.current_utterance].update()
 
     def update(self):
         if self.done: return
@@ -117,17 +128,8 @@ class TextGUI:
         if self.throttle_timer.done:
             self.throttle_input = False
 
-        self.fixed_update_timer.update()
-        if not self.fixed_update_timer.done: return
-
-        self.utterances[self.current_utterance].update()
+        self.fixed_text.update()
         self.handle_keypress()
-
-        self.fixed_update_timer.reset()
-
-    def render(self, surface: Surface):
-        if not self.done:
-            self.utterances[self.current_utterance].render(surface)
 
     def handle_keypress(self):
         if self.throttle_input: return
@@ -139,6 +141,11 @@ class TextGUI:
                 self.done = True
             else:
                 self.throttle_timer.reset()
+
+    def render(self, surface: Surface):
+        if self.done: return
+
+        self.utterances[self.current_utterance].render(surface)
 
 
 @cache

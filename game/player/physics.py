@@ -1,6 +1,7 @@
 import numpy as np
 from attr import define
 from pygame import Rect
+from pygame.event import Event, post
 
 from game.constants import UserEvent
 from game.timing import FixedUpdate
@@ -73,6 +74,7 @@ class PhysicsState:
 
     def step(self, time):
         euler(self, time)
+        self.vel.x
 
     def move_left(self):
         self.vel.x = -self.speed
@@ -83,7 +85,7 @@ class PhysicsState:
         self.pos.x += 1
 
     def jump(self):
-        self.vel.y = -self.jump_speed
+        self.vel.y -= self.jump_speed
         self.pos.y -= 1
 
     def lateral_stop(self):
@@ -105,6 +107,7 @@ class PhysicsState:
             self.vertical_stop()
             self.snap_upward(player, rect)
             self.blocked.south = True
+            post(Event(UserEvent.PLAYER_LAND))
 
         # East
         if rect.collidepoint(player.midright):

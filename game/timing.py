@@ -1,11 +1,8 @@
 from attr import define
+from pygame.event import Event, post
 from pygame.time import Clock
 
 from game import game_clock
-
-from pygame.event import Event, post
-
-from game.constants import UserEvent
 
 
 @define(kw_only=True)
@@ -23,7 +20,7 @@ class Timer:
 
     def reset(self):
         self.cumulative_millis = 0
-        self.done = 0
+        self.done = False
 
 
 @define(frozen=True, kw_only=True)

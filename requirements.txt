@@ -2,3 +2,4 @@ pygame
 attrs
 numpy
 pyinstaller
+aenum
