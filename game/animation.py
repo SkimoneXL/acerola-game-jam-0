@@ -60,6 +60,8 @@ class AnimationState:
             Animation.create(AnimationPath.JUMP_LEFT, loop=False, flipped=True),
             Animation.create(AnimationPath.AIR_SPIN_RIGHT, loop=True),
             Animation.create(AnimationPath.AIR_SPIN_LEFT, loop=True, flipped=True),
+            Animation.create(AnimationPath.WALL_SLIDE_RIGHT, loop=True),
+            Animation.create(AnimationPath.WALL_SLIDE_LEFT, loop=True, flipped=True),
         ]
         return AnimationState(
             animations=animations,

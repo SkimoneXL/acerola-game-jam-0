@@ -137,7 +137,3 @@ class PhysicsState:
 def euler(state: PhysicsState, time: float):
     state.pos.data += state.vel.data * time
     state.vel.data += (state.force.data / state.mass) * time
-
-
-def midpoint(state: PhysicsState, time: float):
-    ...

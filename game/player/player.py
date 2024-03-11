@@ -73,18 +73,24 @@ class Player(Sprite):
 
     def move_right(self):
         self.physics.move_right()
+        self._set_animation_facing_right()
+
+    def _set_animation_facing_right(self):
         if self.physics.blocked.south:
             self.animation.set(AnimationPath.RUN_RIGHT)
-        elif self.jump_counter == 1:
+        elif self.jump_counter <= 1:
             self.animation.set(AnimationPath.JUMP_RIGHT)
         else:
             self.animation.set(AnimationPath.AIR_SPIN_RIGHT)
 
     def move_left(self):
         self.physics.move_left()
+        self._set_animation_facing_left()
+
+    def _set_animation_facing_left(self):
         if self.physics.blocked.south:
             self.animation.set(AnimationPath.RUN_LEFT)
-        elif self.jump_counter == 1:
+        elif self.jump_counter <= 1:
             self.animation.set(AnimationPath.JUMP_LEFT)
         else:
             self.animation.set(AnimationPath.AIR_SPIN_LEFT)
@@ -94,7 +100,7 @@ class Player(Sprite):
             self.physics.jump()
             self.can_jump = False
             self.jump_counter += 1
-            if self.jump_counter == 1:
+            if self.jump_counter <= 1:
                 self.animation.set(self.animation.jump)
             else:
                 self.animation.set(self.animation.air_spin)

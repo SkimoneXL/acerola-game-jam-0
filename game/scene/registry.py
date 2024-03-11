@@ -13,10 +13,10 @@ class AnimationPath(StrEnum):
     RUN_LEFT = 'game/assets/animations/player run 48x48.png'
     JUMP_RIGHT = 'game/assets/animations/player jump 48x48.png'
     JUMP_LEFT = 'game/assets/animations/player jump 48x48.png'
-    AIR_SPIN_LEFT = 'game/assets/animations/player air spin 48x48.png'
     AIR_SPIN_RIGHT = 'game/assets/animations/player air spin 48x48.png'
-    WALL_SLIDE_LEFT = 'game/assets/animations/player wall slide 48x48.png'
+    AIR_SPIN_LEFT = 'game/assets/animations/player air spin 48x48.png'
     WALL_SLIDE_RIGHT = 'game/assets/animations/player wall slide 48x48.png'
+    WALL_SLIDE_LEFT = 'game/assets/animations/player wall slide 48x48.png'
 
 
 @unique
