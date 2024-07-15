@@ -8,7 +8,7 @@ from game.scene.registry import AnimationPath
 from game.timing import FixedUpdate
 
 
-@define(kw_only=True)
+@define(kw_only=True, slots=True)
 class Animation:
     frame_set: TileSet
     frame_data: list[Tile]
@@ -42,7 +42,7 @@ class Animation:
             self.current_frame = min(self.current_frame + 1, len(self.frame_data) - 1)
 
 
-@define(kw_only=True)
+@define(kw_only=True, slots=True)
 class AnimationState:
     animations: list[Animation]
     fixed_animation: FixedUpdate

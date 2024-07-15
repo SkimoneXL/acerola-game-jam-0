@@ -7,7 +7,7 @@ from game.constants import UserEvent
 from game.timing import FixedUpdate
 
 
-@define
+@define(slots=True)
 class Vec2:
     data: np.ndarray
 
@@ -35,7 +35,7 @@ class Vec2:
         return int(self.x), int(self.y)
 
 
-@define
+@define(slots=True)
 class BlockedState:
     north: bool = False
     south: bool = False
@@ -49,7 +49,7 @@ class BlockedState:
         self.west = False
 
 
-@define(kw_only=True)
+@define(kw_only=True, slots=True)
 class PhysicsState:
     pos: Vec2 = Vec2(0.0, 0.0)
     vel: Vec2 = Vec2(0.0, 0.0)
@@ -74,7 +74,6 @@ class PhysicsState:
 
     def step(self, time):
         euler(self, time)
-        self.vel.x
 
     def move_left(self):
         self.vel.x = -self.speed

@@ -14,7 +14,7 @@ from game.scene.registry import FontPath, SceneIndex, ScriptPath
 from game.timing import FixedUpdate, Timer
 
 
-@define(kw_only=True)
+@define(kw_only=True, slots=True)
 class ScrolledText:
     text: str
     font: Font
@@ -43,7 +43,7 @@ class ScrolledText:
         return self._index >= len(self.text)
 
 
-@define(kw_only=True)
+@define(kw_only=True, slots=True)
 class Utterance:
     lines: tuple[ScrolledText, ...]
     current_line: int
@@ -85,7 +85,7 @@ class Utterance:
             line.render(surface)
 
 
-@define(kw_only=True)
+@define(kw_only=True, slots=True)
 class TextGUI:
     font: Font
     fixed_text: FixedUpdate

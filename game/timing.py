@@ -5,7 +5,7 @@ from pygame.time import Clock
 from game import game_clock
 
 
-@define(kw_only=True)
+@define(kw_only=True, slots=True)
 class Timer:
     duration_millis: int
     clock: Clock = game_clock
@@ -23,7 +23,7 @@ class Timer:
         self.done = False
 
 
-@define(frozen=True, kw_only=True)
+@define(frozen=True, kw_only=True, slots=True)
 class FixedUpdate:
     fixed_update_timer: Timer
     updates_per_second: int
