@@ -12,21 +12,21 @@ class School_1(Scene):
 
     def __init__(self, player: Player) -> None:
         super().__init__(player)
-        self.gui = TextGUI.create(SceneIndex.SCHOOL_1)
+        # self.gui = TextGUI.create(SceneIndex.SCHOOL_1)
         self.tilemap = TileMap(TileMapPath.SCHOOL_1)
 
     def render(self, surface: Surface) -> None:
         self.tilemap.render(surface)
         self.player.render(surface)
-        self.gui.render(surface)
+        # self.gui.render(surface)
 
     def update(self) -> None:
         self.player.update()
         self.detect_collisions()
-        self.gui.update()
+        # self.gui.update()
 
     def detect_collisions(self) -> None:
-        for rect in self.tilemap.get_tile_bounds():
+        for rect in self.player.get_nearby_tile_bounds(self.tilemap):
             self.player.physics.detect_collision(self.player.rect, rect)
 
     def get_next_scene(self) -> SceneIndex:
@@ -35,7 +35,7 @@ class School_1(Scene):
     def handle_event(self, event) -> None:
         self.player.handle_event(event)
         self.tilemap.handle_event(event)
-        self.gui.handle_event(event)
+        # self.gui.handle_event(event)
 
 
 class School_2(Scene):

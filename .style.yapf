@@ -3,4 +3,6 @@ split_all_comma_separated_values = false
 split_all_top_level_comma_separated_values = false
 continuation_align_style = space
 column_limit = 100
-disable_ending_comma_heuristic=false
+disable_ending_comma_heuristic = false
+coalesce_brackets = false
+dedent_closing_brackets = true

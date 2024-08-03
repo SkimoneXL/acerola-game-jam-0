@@ -1,4 +1,6 @@
+from functools import cached_property, lru_cache
 import json
+from random import randint, random
 
 import numpy as np
 import pygame
@@ -50,7 +52,8 @@ class TileSet:
                         index=len(tiles),
                         collision=has_collision[j][i],
                         rect=tile.get_rect(),
-                    ))
+                    )
+                )
 
         return TileSet(
             empty_tile_index=empty_tile_index,
@@ -63,11 +66,11 @@ class TileSet:
 
     @staticmethod
     def player(
-            src_img_path: str,
-            margin: int = 0,
-            size: tuple[int, int] = (48, 48),
-            spacing: int = 0,
-            flipped: bool = False,
+        src_img_path: str,
+        margin: int = 0,
+        size: tuple[int, int] = (48, 48),
+        spacing: int = 0,
+        flipped: bool = False,
     ):
         image = pygame.image.load(src_img_path).convert_alpha()
         w, h = image.get_rect().size
@@ -88,7 +91,8 @@ class TileSet:
                         index=len(tiles),
                         collision=True,
                         rect=tile.get_rect(),
-                    ))
+                    )
+                )
 
         return TileSet(
             empty_tile_index=None,
@@ -107,21 +111,21 @@ class TileMap:
         self.level_json_filename = level_json_filename
         self.load()
 
-    def load(self):
+    def load(self) -> None:
         with open(self.level_json_filename, 'r', encoding='utf-8') as f:
             level_data = json.load(f)
         self.tileset = TileSet.environment(level_data)
         self._parse(level_data)
 
-    def _parse(self, level_data):
+    def _parse(self, level_data) -> None:
         self.map = np.array(level_data['tile_data'])
         self.size = self.map.shape
         self._construct_image()
 
-    def render(self, surface: Surface):
+    def render(self, surface: Surface) -> None:
         surface.blit(self.image, (0, 0))
 
-    def _construct_image(self):
+    def _construct_image(self) -> None:
         h, w = self.size
         self.image = Surface((32 * w, 32 * h), flags=pygame.SRCALPHA).convert_alpha()
         self.rect = self.image.get_rect()
@@ -136,17 +140,40 @@ class TileMap:
                     (j * 32, i * 32),
                 )
 
-    def get_tile_bounds(self):
+    @cached_property
+    def tile_bounds(self) -> dict[tuple[int, int], Rect]:
         m, n = self.map.shape
-        result = []
-        for i in range(m):
-            for j in range(n):
-                ti = self.map[i, j]
-                if ti == self.tileset.empty_tile_index: continue
-                x, y = self.tileset.size
-                result.append(Rect(j * 32, i * 32, x, y))
-        return result
+        return {
+            (j, i): Rect(j * 32, i * 32, *self.tileset.size)
+            for i in range(m)
+            for j in range(n) if self.map[i, j] != self.tileset.empty_tile_index
+        }
 
-    def handle_event(self, event):
+    @lru_cache(maxsize=128)
+    def adjacent_tiles(self, x: int, y: int) -> tuple[tuple[int, int], ...]:
+        return (
+            (x, y),
+            (x + 1, y),
+            (x, y + 1),
+            (x + 1, y + 1),
+            (x - 1, y),
+            (x, y - 1),
+            (x - 1, y - 1),
+            (x - 1, y + 1),
+            (x + 1, y - 1),
+        )
+
+    def screen_space_to_tile_space(self, x: int, y: int) -> tuple[int, int]:
+        size_x, size_y = self.tileset.size
+        return x // size_x, y // size_y
+
+    def get_nearby_tile_bounds(self, rect: Rect) -> tuple[Rect, ...]:
+        return tuple(
+            self.tile_bounds[i, j]
+            for i, j in self.adjacent_tiles(*self.screen_space_to_tile_space(*rect.center))
+            if (i, j) in self.tile_bounds
+        )
+
+    def handle_event(self, event) -> None:
         if event.type == pygame.KEYDOWN and event.key == pygame.K_l:
             self.load()

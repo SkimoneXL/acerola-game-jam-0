@@ -1,10 +1,11 @@
 import pygame
-from pygame import Surface
+from pygame import Rect, Surface
 from pygame.sprite import Sprite
 
 from game.animation import AnimationState
 from game.constants import UserEvent
 from game.player.physics import PhysicsState
+from game.scene.levels.tiling import TileMap
 from game.scene.registry import AnimationPath
 
 
@@ -21,10 +22,10 @@ class Player(Sprite):
         self.can_jump = True
 
     @property
-    def position(self):
+    def position(self) -> tuple[int, int]:
         return self.physics.pos.xy
 
-    def update(self):
+    def update(self) -> None:
         self.handle_held_keys()
         self.update_jump_state()
         self.image = self.animation.current_image
@@ -33,7 +34,7 @@ class Player(Sprite):
         self.rect.update(*self.position, self.rect.width, self.rect.height)
         self.update_if_idle()
 
-    def handle_held_keys(self):
+    def handle_held_keys(self) -> None:
         keys = pygame.key.get_pressed()
         if keys[pygame.K_a] and keys[pygame.K_d]:
             if self.last_keyup == pygame.K_a:
@@ -45,10 +46,10 @@ class Player(Sprite):
         elif keys[pygame.K_d]:
             self.move_right()
 
-    def render(self, surface: Surface):
+    def render(self, surface: Surface) -> None:
         surface.blit(self.image, self.position)
 
-    def handle_event(self, event):
+    def handle_event(self, event) -> None:
         match (event.type):
             case pygame.KEYUP:
                 match (event.key):
@@ -67,15 +68,15 @@ class Player(Sprite):
                 self.physics.handle_event(event)
                 self.animation.handle_event(event)
 
-    def update_if_idle(self):
+    def update_if_idle(self) -> None:
         if self.physics.blocked.south:
             self.animation.set(self.animation.idle)
 
-    def move_right(self):
+    def move_right(self) -> None:
         self.physics.move_right()
         self._set_animation_facing_right()
 
-    def _set_animation_facing_right(self):
+    def _set_animation_facing_right(self) -> None:
         if self.physics.blocked.south:
             self.animation.set(AnimationPath.RUN_RIGHT)
         elif self.jump_counter <= 1:
@@ -83,11 +84,11 @@ class Player(Sprite):
         else:
             self.animation.set(AnimationPath.AIR_SPIN_RIGHT)
 
-    def move_left(self):
+    def move_left(self) -> None:
         self.physics.move_left()
         self._set_animation_facing_left()
 
-    def _set_animation_facing_left(self):
+    def _set_animation_facing_left(self) -> None:
         if self.physics.blocked.south:
             self.animation.set(AnimationPath.RUN_LEFT)
         elif self.jump_counter <= 1:
@@ -95,7 +96,7 @@ class Player(Sprite):
         else:
             self.animation.set(AnimationPath.AIR_SPIN_LEFT)
 
-    def jump(self):
+    def jump(self) -> None:
         if self.can_jump:
             self.physics.jump()
             self.can_jump = False
@@ -105,7 +106,11 @@ class Player(Sprite):
             else:
                 self.animation.set(self.animation.air_spin)
 
-    def update_jump_state(self):
+    def update_jump_state(self) -> None:
         blocked = self.physics.blocked
         self.can_jump = blocked.east or blocked.west or blocked.south or self.jump_counter < 2
         self.physics.blocked.set_all_false()
+
+    def get_nearby_tile_bounds(self, tilemap: TileMap) -> tuple[Rect, ...]:
+        return tilemap.get_nearby_tile_bounds(self.rect)
+        # return tilemap.tile_bounds.values()
